@@ -6,22 +6,8 @@ import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         File file = new File("/Users/sergpank/work/basic-laboratory/Lesson-12-Files/test.txt");
-
-        System.out.println("path    : " + file.getAbsolutePath());
-        System.out.println("exists  : " + file.exists());
-        System.out.println("is file : " + file.isFile());
-        System.out.println("is dir  : " + file.isDirectory());
-        System.out.println("parent  : " + file.getParent());
-        file.createNewFile();
-        System.out.println("created!");
-        System.out.println("exists_ : " + file.exists());
-        System.out.println("is file : " + file.isFile());
-        System.out.println("is dir  : " + file.isDirectory());
-        System.out.println("parent_ : " + file.getParent());
-        System.out.println("parent is file : " + file.getParentFile().isFile());
-        System.out.println("parent is dir  : " + file.getParentFile().isDirectory());
 
         File[] dirFiles = file.getParentFile().listFiles();
         List<MyFile> myFiles = new ArrayList<>();
@@ -33,7 +19,7 @@ public class Main {
         Collections.sort(myFiles);
         myFiles.forEach(System.out::println);
 
-//        List<Integer> salaries = readSalaries(file);
+        List<Integer> salaries = readSalaries(file);
 //
 //        // average
 //        countAverage(salaries);
@@ -63,22 +49,26 @@ public class Main {
         System.out.println("Average salary is : " + averageSalary);
     }
 
-    private static List<Integer> readSalaries(File file) throws IOException {
+    private static List<Integer> readSalaries(File file) {
         List<Integer> result = new ArrayList<>();
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        String line;
-        int cnt = 0;
-        while ((line = br.readLine()) != null)
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file)))
         {
-            if (cnt++ == 0){
-                continue;
+            String line;
+            int cnt = 0;
+            while ((line = br.readLine()) != null) {
+                if (cnt++ == 0) {
+                    continue;
+                }
+                String[] split = line.split("\\,");
+                String rawData = split[25];
+                System.out.println("raw data = [" + rawData + "]");
+                result.add(Integer.valueOf(rawData));
             }
-            String[] split = line.split("\\,");
-            String rawData = split[25];
-            System.out.println("raw data = [" + rawData + "]");
-            result.add(Integer.valueOf(rawData));
+        } catch (IOException e) {
+            e.printStackTrace();
+            new RuntimeException("unexpected error : stop execution");
         }
-        br.close();
 
         return result;
     }
